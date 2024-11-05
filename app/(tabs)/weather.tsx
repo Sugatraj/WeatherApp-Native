@@ -4,19 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import axios from 'axios';
 import { Keyboard } from 'react-native';
-
-const COLORS = {
-  primary: '#1E90FF',    // Dodger Blue
-  secondary: '#F8F9FA',  // Light Gray
-  text: '#2C3E50',       // Dark Blue Gray
-  textLight: '#6C757D',  // Gray
-  accent: '#00B4D8',     // Light Blue
-  white: '#FFFFFF',
-  error: '#DC3545',      // Red
-  success: '#28A745',    // Green
-  warning: '#FFC107',    // Yellow
-  border: '#E9ECEF'      // Light Gray
-};
+import { AnimatedWeatherIcon } from '@/components/AnimatedWeatherIcon';
+import { WeatherDetails } from '@/components/WeatherDetails';
+import { COLORS } from '@/constants/Colors';
 
 const Weather = () => {
   const [count, setCount] = useState(0)
@@ -53,6 +43,7 @@ const Weather = () => {
       }
       const data = await response.json();
       setWeatherData(data);
+      console.log(data);
     } catch (error) {
       setError(error.message);
       setWeatherData(null);
@@ -83,27 +74,6 @@ const Weather = () => {
   useEffect(() => {
     console.log(count, time);
   }, [count])
-
-  const getWeatherIcon = (condition: string) => {
-    const icons = {
-      Clear: 'sunny-outline',
-      Clouds: 'cloud-outline',
-      Rain: 'rainy-outline',
-      Drizzle: 'water-outline',
-      Thunderstorm: 'thunderstorm-outline',
-      Snow: 'snow-outline',
-      Mist: 'water-outline',
-      Smoke: 'cloud-outline',
-      Haze: 'cloud-outline',
-      Dust: 'cloud-outline',
-      Fog: 'cloud-outline',
-      Sand: 'cloud-outline',
-      Ash: 'cloud-outline',
-      Squall: 'thunderstorm-outline',
-      Tornado: 'thunderstorm-outline',
-    };
-    return icons[condition as keyof typeof icons] || 'cloud-outline';
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -146,107 +116,8 @@ const Weather = () => {
         )}
 
         {weatherData && (
-          <ScrollView 
-            style={styles.weatherContainer}
-            showsVerticalScrollIndicator={false}
-          >
-            <View style={styles.weatherHeaderContainer}>
-              <View style={styles.weatherTitleContainer}>
-                <Text style={styles.cityName}>{weatherData.name}, {weatherData.sys.country}</Text>
-                <Text style={styles.coordinates}>
-                  Lat: {weatherData.coord.lat}°, Lon: {weatherData.coord.lon}°
-                </Text>
-              </View>
-              
-              <TouchableOpacity
-                style={[styles.iconButton, styles.clearButton]}
-                onPress={handleClear}
-              >
-                <TabBarIcon name="close-outline" color={COLORS.textLight} size={18} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.tempContainer}>
-              <Text style={styles.temperature}>{Math.round(weatherData.main.temp)}°C</Text>
-              <View style={styles.weatherIconContainer}>
-                <TabBarIcon 
-                  name={getWeatherIcon(weatherData.weather[0].main)} 
-                  color={COLORS.primary} 
-                  size={64} 
-                />
-                <Text style={styles.weatherMain}>{weatherData.weather[0].main}</Text>
-              </View>
-              <Text style={styles.weatherDescription}>{weatherData.weather[0].description}</Text>
-            </View>
-
-            <View style={styles.detailsContainer}>
-              <View style={styles.weatherDetail}>
-                <Text style={styles.detailLabel}>Feels Like</Text>
-                <Text style={styles.detailValue}>{Math.round(weatherData.main.feels_like)}°C</Text>
-              </View>
-
-              <View style={styles.weatherDetail}>
-                <Text style={styles.detailLabel}>Min/Max</Text>
-                <Text style={styles.detailValue}>
-                  {Math.round(weatherData.main.temp_min)}°/{Math.round(weatherData.main.temp_max)}°
-                </Text>
-              </View>
-
-              <View style={styles.weatherDetail}>
-                <Text style={styles.detailLabel}>Humidity</Text>
-                <Text style={styles.detailValue}>{weatherData.main.humidity}%</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailsContainer}>
-              <View style={styles.weatherDetail}>
-                <Text style={styles.detailLabel}>Wind Speed</Text>
-                <Text style={styles.detailValue}>{weatherData.wind.speed} m/s</Text>
-              </View>
-
-              <View style={styles.weatherDetail}>
-                <Text style={styles.detailLabel}>Wind Direction</Text>
-                <Text style={styles.detailValue}>{weatherData.wind.deg}°</Text>
-              </View>
-
-              <View style={styles.weatherDetail}>
-                <Text style={styles.detailLabel}>Wind Gust</Text>
-                <Text style={styles.detailValue}>{weatherData.wind.gust} m/s</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailsContainer}>
-              <View style={styles.weatherDetail}>
-                <Text style={styles.detailLabel}>Pressure</Text>
-                <Text style={styles.detailValue}>{weatherData.main.pressure} hPa</Text>
-              </View>
-
-              <View style={styles.weatherDetail}>
-                <Text style={styles.detailLabel}>Visibility</Text>
-                <Text style={styles.detailValue}>{weatherData.visibility / 1000} km</Text>
-              </View>
-
-              <View style={styles.weatherDetail}>
-                <Text style={styles.detailLabel}>Clouds</Text>
-                <Text style={styles.detailValue}>{weatherData.clouds.all}%</Text>
-              </View>
-            </View>
-
-            <View style={styles.sunContainer}>
-              <View style={styles.weatherDetail}>
-                <Text style={styles.detailLabel}>Sunrise</Text>
-                <Text style={styles.detailValue}>
-                  {new Date(weatherData.sys.sunrise * 1000).toLocaleTimeString()}
-                </Text>
-              </View>
-
-              <View style={styles.weatherDetail}>
-                <Text style={styles.detailLabel}>Sunset</Text>
-                <Text style={styles.detailValue}>
-                  {new Date(weatherData.sys.sunset * 1000).toLocaleTimeString()}
-                </Text>
-              </View>
-            </View>
+          <ScrollView style={styles.weatherContainer}>
+            <WeatherDetails weatherData={weatherData} />
           </ScrollView>
         )}
       </View>
